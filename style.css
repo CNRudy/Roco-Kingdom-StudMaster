@@ -168,3 +168,178 @@ a {
     margin: 0 12px;
     font-weight: bold;
 }
+/* 我的宠物仓 样式 */
+.pet-garage {
+    margin-top: 2rem;
+    background: #fefef7;
+    border-radius: 28px;
+    border: 1px solid #dee6d6;
+    padding: 1.2rem 1.8rem;
+}
+.garage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+.add-pet-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    background: #f5f8f0;
+    padding: 12px;
+    border-radius: 28px;
+}
+.add-pet-form select, .add-pet-form input, .add-pet-form textarea {
+    padding: 8px 12px;
+    border-radius: 40px;
+    border: 1px solid #cbdcc2;
+    font-family: inherit;
+}
+.filter-bar {
+    margin: 15px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+}
+.nature-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.nature-checkbox {
+    background: #eef3e9;
+    border-radius: 30px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.nature-checkbox.selected {
+    background: #f1b82e;
+    color: #2c2b1f;
+}
+.pet-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.pet-table th, .pet-table td {
+    padding: 10px 6px;
+    border-bottom: 1px solid #e9eddf;
+    text-align: left;
+    vertical-align: middle;
+}
+.stud-badge {
+    background: #f1b82e;
+    color: #2c2b1f;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: inline-block;
+}
+.overlap-warning {
+    background: #ffeedd;
+    color: #c96f0e;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.7rem;
+}
+.delete-pet {
+    color: #d95b5b;
+    cursor: pointer;
+    font-weight: bold;
+}
+.nature-tooltip {
+    border-bottom: 1px dashed #aaa;
+    cursor: help;
+}
+.threshold-slider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+/* 折叠卡片样式补充 */
+.collapsible {
+    margin-bottom: 1.5rem;
+    border-radius: 28px;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #dee6d6;
+}
+.collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.8rem 1.5rem;
+    background: #faf6e9;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+.collapsible-header:hover {
+    background: #f5efdd;
+}
+.collapse-icon {
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+.collapsible-content {
+    padding: 0;
+    background: #fefef7;
+}
+.collapsed .collapsible-content {
+    display: none;
+}
+.collapsed .collapse-icon {
+    transform: rotate(-90deg);
+}
+/* 原有卡片边距重置 */
+.result-card, .stud-list, #groupPetsPanel, .pet-garage {
+    margin: 0;
+    border: none;
+    background: transparent;
+}
+.result-card {
+    margin-top: 0;
+}
+.stud-list {
+    padding: 1rem;
+}
+#groupPetsList {
+    padding: 1rem;
+}
+/* 种公匹配列表排版修复 */
+#studMatchList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.stud-item {
+    display: inline-flex;
+    align-items: center;
+    background: #fff0cc;
+    border-radius: 40px;
+    padding: 6px 18px;
+    cursor: pointer;
+    transition: 0.1s;
+    font-weight: 500;
+    color: #b45f06;
+    border: 1px solid #f5d48a;
+    white-space: nowrap;
+}
+.stud-item .stud-count,
+.stud-item .common-groups {
+    margin-left: 8px;
+    font-size: 0.7rem;
+}
+.stud-list {
+    background: #fef7e0;
+    border-radius: 28px;
+    padding: 1rem;
+}

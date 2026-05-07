@@ -2,85 +2,197 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>洛克王国 · 蛋组查询器 + 种公匹配</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>洛克王国 · 蛋组查询器 · 种公匹配</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .stud-list {
-            margin-top: 1.5rem;
-            background: #fef7e0;
-            border-radius: 28px;
-            padding: 1rem 1.8rem;
-            border-left: 6px solid #f5b642;
+        /* ========== 全局样式 ========== */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        .stud-item {
-            display: inline-block;
-            background: #fff0cc;
+
+        /* 折叠卡片样式 */
+        .collapsible {
+            margin-bottom: 1.5rem;
+            border-radius: 28px;
+            background: #fff;
+            overflow: hidden;
+            border: 1px solid #dee6d6;
+        }
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.8rem 1.5rem;
+            background: #faf6e9;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .collapsible-header:hover {
+            background: #f5efdd;
+        }
+        .collapse-icon {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .collapsible-content {
+            padding: 0;
+            background: #fefef7;
+        }
+        .collapsed .collapsible-content {
+            display: none;
+        }
+        .collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        /* 提示信息条 - 独立且稳定 */
+        .info-tip {
+            background: #e9f4e8;
+            border-left: 5px solid #f1b82e;
+            border-radius: 20px;
+            padding: 10px 18px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            color: #2d411c;
+            text-align: left;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .info-tip b {
+            color: #b45f06;
+        }
+
+        /* 原有卡片内边距恢复 */
+        .result-card, .stud-list, #groupPetsPanel {
+            margin: 0;
+            border: none;
+            background: transparent;
+        }
+        .result-card {
+            margin-top: 0;
+        }
+        .stud-list {
+            padding: 1rem;
+        }
+        #groupPetsList {
+            padding: 1rem;
+        }
+
+        /* 添加到仓库按钮 */
+        .add-to-garage-btn {
+            background: #2b5e2f;
+            color: white;
+            border: none;
             border-radius: 40px;
-            padding: 6px 18px;
-            margin: 6px 8px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: 0.2s;
+        }
+        .add-to-garage-btn:hover {
+            background: #1e4521;
+        }
+
+        /* 性格九宫格 - 固定一行五个，滚动 */
+        .nature-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+            max-height: 280px;
+            overflow-y: auto;
+            padding: 12px;
+            background: #f9faf0;
+            border-radius: 32px;
+        }
+        .nature-option {
+            background: white;
+            border: 1px solid #cbdcc2;
+            border-radius: 48px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.1s;
-            font-weight: 500;
-            color: #b45f06;
-            border: 1px solid #f5d48a;
+            white-space: normal;
+            word-break: keep-all;
+            line-height: 1.2;
         }
-        .stud-item:hover {
-            background: #ffe0a3;
-            transform: scale(1.02);
+        .nature-option.selected {
+            background: #f1b82e;
+            color: #2c2b1f;
+            border-color: #e08e1a;
         }
-        .stud-count {
-            background: #e6c87a;
-            border-radius: 30px;
-            padding: 2px 10px;
-            font-size: 0.7rem;
-            margin-left: 8px;
-            font-weight: bold;
-            color: #4a2e00;
+
+        /* 模态框（添加到种公仓库弹窗）放大 */
+        #addToGarageModal > div {
+            max-width: 95%;
+            width: 380px;
+            padding: 24px;
         }
-        .common-groups {
-            font-size: 0.7rem;
-            background: #fbe5b9;
-            border-radius: 30px;
-            padding: 0 8px;
-            margin-left: 6px;
-            display: inline-block;
+        #addToGarageModal h3 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
         }
-        .no-stud {
-            background: #f0e6d2;
-            padding: 12px;
-            border-radius: 28px;
-            text-align: center;
-            color: #aa7c58;
-        }.info-tip {
-    background: #e9f4e8;
-    border-left: 5px solid #f1b82e;
-    border-radius: 20px;
-    padding: 10px 18px;
-    margin: 15px 0;
-    font-size: 0.85rem;
-    color: #2d411c;
-    text-align: left;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-.info-tip b {
-    color: #b45f06;
-}
+        #addToGarageModal button {
+            font-size: 1rem;
+            padding: 10px 20px;
+            margin: 0 8px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .collapsible-header {
+                padding: 0.6rem 1rem;
+                font-size: 1rem;
+            }
+            .nature-grid {
+                gap: 6px;
+                padding: 8px;
+            }
+            .nature-option {
+                font-size: 0.75rem;
+                padding: 6px 2px;
+            }
+            .add-to-garage-btn {
+                padding: 4px 12px;
+                font-size: 0.7rem;
+            }
+            #addToGarageModal > div {
+                width: 320px;
+                padding: 16px;
+            }
+        }
+
+        /* 自定义滚动条（可选） */
+        .nature-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        .nature-grid::-webkit-scrollbar-track {
+            background: #e2e8e0;
+            border-radius: 4px;
+        }
+        .nature-grid::-webkit-scrollbar-thumb {
+            background: #a0b896;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="hero">
         <div style="text-align:center; font-size:0.7rem; padding: 1rem; color: #6f7c64;">
-    🧪 非商用工具 | 数据基于洛克王国 | 禁止用于盈利性目的
-</div>
-        <h1>🐣 蛋组查询器 · 种公匹配</h1>
-        <!-- 新增提示 -->
-        <div class="info-tip">
-        💡 提示：以下宠物在游戏中存在进化分支，本数据库统一使用<b>最小形态</b>名称：<br>
-        可立鸡 · 粉星仔 · 画精灵 · 书魔虫 · 棋棋 · 毛头小蛛 · 乖乖鹄 · 果冻 · 墨鱿士
-        
+        🧪 非商用工具 | 数据基于洛克王国 | 禁止用于盈利性目的
         </div>
-
+        <h1>🐣 蛋组查询器 · 种公匹配</h1>
+        <div class="info-tip">
+            💡 提示：以下宠物使用<b>最小形态</b>名称：可立鸡 · 粉星仔 · 画精灵 · 书魔虫 · 棋棋 · 毛头小蛛 · 乖乖鹄 · 果冻 · 墨鱿士
+        </div>
         <div class="search-box" style="position: relative;">
             <input type="text" id="petInput" placeholder="输入宠物名称，例如 粉星仔" autocomplete="off">
             <button id="searchBtn">查询</button>
@@ -90,24 +202,57 @@
         <div id="autocompleteList" style="position: relative;"></div>
         <div class="nav-links" style="margin-top: 10px;">
             <a href="admin.html">📝 数据维护</a>
+            <a href="stud-repo.html">📦 种公仓库</a>
         </div>
     </div>
 
-    <div class="result-card">
-        <div id="resultBadges"></div>
+    <!-- 查询结果卡片（可折叠） -->
+    <div class="collapsible" id="resultCollapsible">
+        <div class="collapsible-header">
+            <span>🔍 查询结果</span>
+            <span class="collapse-icon">▼</span>
+        </div>
+        <div class="collapsible-content">
+            <div class="result-card"><div id="resultBadges"></div></div>
+        </div>
     </div>
 
-    <div id="studMatchPanel" style="display:none;" class="stud-list">
-        <h3>✨ 可与该宠物孵蛋的优质种公 ✨</h3>
-        <p style="font-size:0.8rem; margin-bottom:8px;">💡 优先展示自身蛋组多的种公（蛋组越多，配种范围越广）</p>
-        <div id="studMatchList"></div>
+    <!-- 种公匹配面板（可折叠） -->
+    <div class="collapsible" id="studMatchCollapsible" style="display: none;">
+        <div class="collapsible-header">
+            <span>✨ 可与该宠物孵蛋的优质种公</span>
+            <span class="collapse-icon">▼</span>
+        </div>
+        <div class="collapsible-content">
+            <div class="stud-list"><div id="studMatchList"></div></div>
+        </div>
     </div>
 
-    <div id="groupPetsPanel" style="display:none;">
-        <h3>🐾 该蛋组包含的宠物</h3>
-        <div id="groupPetsList"></div>
+    <!-- 蛋组宠物面板（可折叠） -->
+    <div class="collapsible" id="groupPetsCollapsible" style="display: none;">
+        <div class="collapsible-header">
+            <span>🐾 该蛋组包含的宠物</span>
+            <span class="collapse-icon">▼</span>
+        </div>
+        <div class="collapsible-content">
+            <div id="groupPetsList"></div>
+        </div>
+    </div>
+
+    <!-- 添加到仓库的弹窗（隐藏） -->
+    <div id="addToGarageModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+        <div style="background:white; border-radius:32px; padding:20px; max-width:90%; width:300px; text-align:center;">
+            <h3>添加到种公仓库</h3>
+            <p id="modalPetName"></p>
+            <div id="natureGrid" class="nature-grid"></div>
+            <div style="margin-top:16px;">
+                <button id="confirmAddBtn" style="background:#2b5e2f; color:white;">确认添加</button>
+                <button id="cancelAddBtn" style="background:#ccc;">取消</button>
+            </div>
+        </div>
     </div>
 </div>
+
 <script src="data.js"></script>
 <script src="common.js"></script>
 <script>
@@ -116,13 +261,94 @@
     const searchBtn = document.getElementById('searchBtn');
     const randomBtn = document.getElementById('randomBtn');
     const resultBadges = document.getElementById('resultBadges');
-    const groupPetsPanel = document.getElementById('groupPetsPanel');
     const groupPetsList = document.getElementById('groupPetsList');
     const autocompleteDiv = document.getElementById('autocompleteList');
-    const studMatchPanel = document.getElementById('studMatchPanel');
     const studMatchList = document.getElementById('studMatchList');
+    const resultCollapsible = document.getElementById('resultCollapsible');
+    const studMatchCollapsible = document.getElementById('studMatchCollapsible');
+    const groupPetsCollapsible = document.getElementById('groupPetsCollapsible');
+    const modal = document.getElementById('addToGarageModal');
+    const modalPetNameSpan = document.getElementById('modalPetName');
+    const natureGrid = document.getElementById('natureGrid');
+    const confirmAddBtn = document.getElementById('confirmAddBtn');
+    const cancelAddBtn = document.getElementById('cancelAddBtn');
 
     let allPetNames = getAllPetNames();
+    let currentSelectedPet = null;
+    let selectedNature = null;
+
+    // 完整30种性格数据
+    const NATURE_INFO = {
+        "聪明": { inc: "魔攻", dec: "物攻" }, "专注": { inc: "魔攻", dec: "物防" }, "偏执": { inc: "魔攻", dec: "魔防" },
+        "冷静": { inc: "魔攻", dec: "速度" }, "理性": { inc: "魔攻", dec: "生命" }, "固执": { inc: "物攻", dec: "魔攻" },
+        "大胆": { inc: "物攻", dec: "物防" }, "调皮": { inc: "物攻", dec: "魔防" }, "勇敢": { inc: "物攻", dec: "速度" },
+        "逞强": { inc: "物攻", dec: "生命" }, "警惕": { inc: "魔防", dec: "物攻" }, "害羞": { inc: "魔防", dec: "魔攻" },
+        "温顺": { inc: "魔防", dec: "物防" }, "慎重": { inc: "魔防", dec: "速度" }, "焦虑": { inc: "魔防", dec: "生命" },
+        "稳重": { inc: "物防", dec: "物攻" }, "天真": { inc: "物防", dec: "魔攻" }, "悠闲": { inc: "物防", dec: "速度" },
+        "懒散": { inc: "物防", dec: "魔防" }, "坦率": { inc: "物防", dec: "生命" }, "胆小": { inc: "速度", dec: "物攻" },
+        "开朗": { inc: "速度", dec: "魔攻" }, "急躁": { inc: "速度", dec: "物防" }, "莽撞": { inc: "速度", dec: "魔防" },
+        "热情": { inc: "速度", dec: "生命" }, "沉默": { inc: "生命", dec: "物攻" }, "平和": { inc: "生命", dec: "魔攻" },
+        "忧郁": { inc: "生命", dec: "物防" }, "粗心": { inc: "生命", dec: "魔防" }, "踏实": { inc: "生命", dec: "速度" }
+    };
+    const ALL_NATURES = Object.keys(NATURE_INFO);
+
+    function loadMyPets() {
+        const stored = localStorage.getItem('my_pets');
+        if (stored) {
+            try { return JSON.parse(stored); } catch(e) { return []; }
+        }
+        return [];
+    }
+    function saveMyPets(pets) {
+        localStorage.setItem('my_pets', JSON.stringify(pets));
+    }
+
+    function addToGarage(petName, nature) {
+        let myPets = loadMyPets();
+        if (myPets.some(p => p.name === petName && p.nature === nature)) {
+            alert(`“${petName} (${nature})” 已在仓库中`);
+            return false;
+        }
+        myPets.push({ name: petName, nature });
+        saveMyPets(myPets);
+        alert(`✅ 已将 ${petName} (${nature}) 添加到种公仓库`);
+        return true;
+    }
+
+    function showNatureSelector(petName) {
+        currentSelectedPet = petName;
+        selectedNature = null;
+        modalPetNameSpan.innerHTML = `🐉 <strong>${petName}</strong>`;
+        natureGrid.innerHTML = '';
+        ALL_NATURES.forEach(nature => {
+            const div = document.createElement('div');
+            div.className = 'nature-option';
+            div.textContent = nature;
+            div.title = `${nature}：+${NATURE_INFO[nature].inc}  -${NATURE_INFO[nature].dec}`;
+            div.addEventListener('click', () => {
+                document.querySelectorAll('.nature-option').forEach(opt => opt.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedNature = nature;
+            });
+            natureGrid.appendChild(div);
+        });
+        modal.style.display = 'flex';
+    }
+
+    confirmAddBtn.onclick = () => {
+        if (!selectedNature) {
+            alert('请选择性格');
+            return;
+        }
+        addToGarage(currentSelectedPet, selectedNature);
+        modal.style.display = 'none';
+    };
+    cancelAddBtn.onclick = () => {
+        modal.style.display = 'none';
+    };
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
 
     function escapeHtml(str) {
         if (!str) return '';
@@ -134,98 +360,69 @@
         });
     }
 
-    // 修正排序：优先按种公自身蛋组数量降序，再按共同蛋组数量降序，最后按名称
-    // function findMatchStuds(currentPetName, currentPetGroups) {
-    //     const currentSet = new Set(currentPetGroups);
-    //     const candidates = [];
-    //     for (let [key, entry] of petToGroups.entries()) {
-    //         if (entry.name === currentPetName) continue;
-    //         const petGroupsSet = entry.groups;
-    //         const common = [];
-    //         for (let g of petGroupsSet) {
-    //             if (currentSet.has(g)) common.push(g);
-    //         }
-    //         if (common.length > 0) {
-    //             candidates.push({
-    //                 name: entry.name,
-    //                 totalGroups: petGroupsSet.size,
-    //                 commonGroups: common
-    //             });
-    //         }
-    //     }
-    //     // 排序：自身蛋组数 > 共同蛋组数 > 名称
-    //     candidates.sort((a,b) => {
-    //         if (a.totalGroups !== b.totalGroups) return b.totalGroups - a.totalGroups;
-    //         if (a.commonGroups.length !== b.commonGroups.length) return b.commonGroups.length - a.commonGroups.length;
-    //         return a.name.localeCompare(b.name);
-    //     });
-    //     return candidates;
-    // }
-    // 替换原来的 findMatchStuds 函数（在 index.html 的 script 中）
-function findMatchStuds(currentPetName, currentPetGroups) {
-    const currentSet = new Set(currentPetGroups);
-    const candidates = [];
-    for (let [key, entry] of petToGroups.entries()) {
-        if (entry.name === currentPetName) continue;
-        const petGroupsSet = entry.groups;
-        const common = [];
-        for (let g of petGroupsSet) {
-            if (currentSet.has(g)) common.push(g);
+    function findMatchStuds(currentPetName, currentPetGroups) {
+        const currentSet = new Set(currentPetGroups);
+        const candidates = [];
+        for (let [key, entry] of petToGroups.entries()) {
+            if (entry.name === currentPetName) continue;
+            const petGroupsSet = entry.groups;
+            const common = [];
+            for (let g of petGroupsSet) {
+                if (currentSet.has(g)) common.push(g);
+            }
+            if (common.length > 0) {
+                candidates.push({
+                    name: entry.name,
+                    totalGroups: petGroupsSet.size,
+                    commonGroups: common,
+                    matchCount: getPetMatchCount(entry.name)
+                });
+            }
         }
-        if (common.length > 0) {
-            candidates.push({
-                name: entry.name,
-                totalGroups: petGroupsSet.size,
-                commonGroups: common,
-                matchCount: getPetMatchCount(entry.name)   // 从 common.js 获取
-            });
-        }
+        candidates.sort((a,b) => {
+            if (a.matchCount !== b.matchCount) return b.matchCount - a.matchCount;
+            if (a.commonGroups.length !== b.commonGroups.length) return b.commonGroups.length - a.commonGroups.length;
+            return b.totalGroups - a.totalGroups;
+        });
+        return candidates;
     }
-    // 排序：先按 matchCount 降序，再按 common 数量降序，再按 totalGroups 降序
-    candidates.sort((a,b) => {
-        if (a.matchCount !== b.matchCount) return b.matchCount - a.matchCount;
-        if (a.commonGroups.length !== b.commonGroups.length) return b.commonGroups.length - a.commonGroups.length;
-        return b.totalGroups - a.totalGroups;
-    });
-    return candidates;
-}
 
     function renderResult(petName) {
         let groups = getPetGroups(petName);
         if (!groups.length) {
             resultBadges.innerHTML = `<div class="not-found">❓ 未找到 “${escapeHtml(petName)}” 的蛋组信息</div>`;
-            groupPetsPanel.style.display = 'none';
-            studMatchPanel.style.display = 'none';
+            studMatchCollapsible.style.display = 'none';
+            groupPetsCollapsible.style.display = 'none';
             return;
         }
-        let html = `<div class="pet-title">🐉 宠物：${escapeHtml(petName)}  · 共 ${groups.length} 个蛋组</div><div class="badge-group">`;
+        let html = `<div class="pet-title" style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>🐉 宠物：${escapeHtml(petName)}  · 共 ${groups.length} 个蛋组</span>
+                        <button class="add-to-garage-btn" id="addToGarageBtn">📥 添加到仓库</button>
+                    </div><div class="badge-group">`;
         groups.forEach(group => {
             html += `<span class="egg-badge" data-group="${escapeHtml(group)}">🧬 ${escapeHtml(group)}</span>`;
         });
         html += `</div>`;
         resultBadges.innerHTML = html;
-        groupPetsPanel.style.display = 'none';
+
+        const addBtn = document.getElementById('addToGarageBtn');
+        if (addBtn) addBtn.onclick = () => showNatureSelector(petName);
 
         document.querySelectorAll('.egg-badge').forEach(el => {
             el.addEventListener('click', (e) => {
                 let groupName = el.getAttribute('data-group');
                 let pets = getPetsByGroup(groupName);
-                if (pets.length) {
-                    groupPetsList.innerHTML = pets.map(p => `<span class="pet-chip">${escapeHtml(p)}</span>`).join('');
-                    groupPetsPanel.style.display = 'block';
-                } else {
-                    groupPetsList.innerHTML = '暂无宠物';
-                    groupPetsPanel.style.display = 'block';
-                }
+                groupPetsList.innerHTML = pets.length ? pets.map(p => `<span class="pet-chip">${escapeHtml(p)}</span>`).join('') : '暂无宠物';
+                groupPetsCollapsible.style.display = 'block';
             });
         });
 
         const matchStuds = findMatchStuds(petName, groups);
         if (matchStuds.length === 0) {
-            studMatchPanel.style.display = 'block';
+            studMatchCollapsible.style.display = 'block';
             studMatchList.innerHTML = '<div class="no-stud">😢 抱歉，当前数据库中没有与该宠物拥有共同蛋组的其他宠物。<br>你可以通过「数据维护」页面添加更多种公。</div>';
         } else {
-            studMatchPanel.style.display = 'block';
+            studMatchCollapsible.style.display = 'block';
             let listHtml = '';
             matchStuds.forEach(stud => {
                 const commonStr = stud.commonGroups.join('、');
@@ -237,7 +434,7 @@ function findMatchStuds(currentPetName, currentPetGroups) {
             });
             studMatchList.innerHTML = listHtml;
             document.querySelectorAll('#studMatchList .stud-item').forEach(item => {
-                item.addEventListener('click', (e) => {
+                item.addEventListener('click', () => {
                     let pet = item.getAttribute('data-pet');
                     petInput.value = pet;
                     renderResult(pet);
@@ -287,6 +484,15 @@ function findMatchStuds(currentPetName, currentPetGroups) {
     petInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchBtn.click();
     });
+
+    function initCollapsible() {
+        document.querySelectorAll('.collapsible').forEach(card => {
+            const header = card.querySelector('.collapsible-header');
+            if (!header) return;
+            header.addEventListener('click', () => card.classList.toggle('collapsed'));
+        });
+    }
+    initCollapsible();
 
     const urlParams = new URLSearchParams(window.location.search);
     const petParam = urlParams.get('pet');
