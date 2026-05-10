@@ -405,7 +405,7 @@
         const currentSet = new Set(currentPetGroups);
         const candidates = [];
         for (let [key, entry] of petToGroups.entries()) {
-            if (entry.name === currentPetName) continue;
+            // if (entry.name === currentPetName) continue;
             const petGroupsSet = entry.groups;
             const common = [];
             for (let g of petGroupsSet) {
